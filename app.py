@@ -461,7 +461,7 @@ def process_task(
     """
     Thread task function: Process single API call, return JSON result (or None if failed).
     """
-    max_retries = 3  # Maximum retry attempts
+    max_retries = 0 if IS_BROWSER else 3  # Surface browser/CORS failures immediately.
     retry_delay_base = 1.0  # Base delay seconds (exponential backoff)
 
     for attempt in range(max_retries + 1):
