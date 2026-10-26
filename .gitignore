@@ -1,0 +1,40 @@
+# Credentials and machine-specific environment files
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Temporary SQLite journal and transaction files (test databases are included)
+*.db-*
+*.sqlite-*
+*.sqlite3-*
+
+# Optional local working directories (root-level test cases are included)
+data/
+uploads/
+outputs/
+
+# Python environments and caches
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+build/
+dist/
+
+# Local Streamlit secrets, editor settings and logs
+.streamlit/secrets.toml
+.streamlit/secrets.*.toml
+.vscode/
+.idea/
+.DS_Store
+*.log
+
+# Rebuilt from an explicit source allowlist by the GitHub Pages workflow
+/docs/app/runtime.zip
