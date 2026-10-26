@@ -1,44 +1,17 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="Run the TimeSeries2Report battery analysis app directly in your browser with Stlite.">
+<meta name="description" content="TimeSeries2Report browser application for battery time series analysis.">
 <title>TimeSeries2Report · Browser App</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@stlite/browser@0.85.1/build/stlite.css">
-<style>body{margin:0;background:#fff;font-family:system-ui,sans-serif;color:#16332d}.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 22px;border-bottom:1px solid #e0e5dd;font-size:13px}.topbar a{color:inherit}.loading{max-width:700px;margin:70px auto;padding:0 24px;line-height:1.7}.loading h1{font-size:28px}.loading p{color:#5e716b}.loading a{color:#245b46}.topbar span{color:#5e716b}#root{min-height:calc(100vh - 45px)}</style>
+<link rel="stylesheet" href="./vendor/stlite/stlite.css">
+<style>body{margin:0;background:#fff;font-family:system-ui,sans-serif;color:#16332d}.topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px 22px;border-bottom:1px solid #e0e5dd;font-size:13px}.topbar a{color:inherit}.startup{padding:16px 24px;background:#f2f5ee;line-height:1.6}.startup p{margin:4px 0}.startup a{color:#245b46}.startup.error{background:#fff0e9}.startup[hidden]{display:none}#root{min-height:calc(100vh - 45px)}</style>
 </head>
 <body>
-<nav class="topbar" aria-label="Application navigation"><a href="../">← TimeSeries2Report</a><span>Browser edition · Powered by Stlite</span><a href="https://github.com/MarsChange/TimeSeries2Report">Source ↗</a></nav>
-<div id="root"><div class="loading" role="status"><h1>Starting TimeSeries2Report…</h1><p>Downloading the Python runtime and scientific packages. First launch can take a few minutes; keep this tab open.</p><p>Once loaded, open <strong>Model Settings</strong> and enter your own API key, HTTPS Base URL and model name. The endpoint must permit browser cross-origin (CORS) requests. An included example report can be viewed without an API key.</p></div></div>
-<script type="module">
-try {
-  const { mount } = await import('https://cdn.jsdelivr.net/npm/@stlite/browser@0.85.1/build/stlite.js');
-  const bundle = new URL('./runtime.zip', location.href).href;
-  const probe = await fetch(bundle, {method:'HEAD'});
-  if (!probe.ok) throw new Error('The application source bundle is unavailable.');
-  mount({
-    entrypoint:'app.py',
-    requirements:['numpy','matplotlib','requests','python-dotenv==1.1.1','reportlab==4.4.9','sqlite3'],
-    archives:[{url:bundle,format:'zip'}],
-    idbfsMountpoints:['/ts2r-data'],
-    streamlitConfig:{
-      'client.toolbarMode':'viewer',
-      'theme.primaryColor':'#245b46',
-      'theme.backgroundColor':'#ffffff',
-      'theme.secondaryBackgroundColor':'#f2f5ee',
-      'theme.textColor':'#16332d'
-    }
-  },document.getElementById('root'));
-} catch (error) {
-  const container=document.querySelector('#root');
-  container.replaceChildren();
-  const box=document.createElement('div');box.className='loading';
-  const title=document.createElement('h1');title.textContent='Unable to start the browser app';
-  const message=document.createElement('p');message.textContent='Check your connection to cdn.jsdelivr.net and the Pyodide package servers, then reload this page. You can also run the native app locally.';
-  const link=document.createElement('a');link.href='https://github.com/MarsChange/TimeSeries2Report#readme';link.textContent='Local installation instructions ↗';
-  box.append(title,message,link);container.append(box);
-}
-</script>
+<nav class="topbar" aria-label="Application navigation"><strong>TimeSeries2Report</strong><a href="https://github.com/MarsChange/TimeSeries2Report#readme">使用说明</a><a href="https://github.com/MarsChange/TimeSeries2Report">Source ↗</a></nav>
+<div id="startup" class="startup" role="status"><strong>正在启动电池分析应用…</strong><p id="startup-detail">首次启动需要下载 Python 运行时和分析依赖，请保持页面打开。</p><p>加载完成后可直接查看内置电池分析报告；使用自己的模型请打开左下角 Model Settings。</p><button type="button" onclick="location.reload()">刷新重试</button></div>
+<div id="root"></div>
+<script type="module" src="./boot.js"></script>
 </body>
 </html>

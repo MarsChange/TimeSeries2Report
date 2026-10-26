@@ -38,3 +38,6 @@ dist/
 
 # Rebuilt from an explicit source allowlist by the GitHub Pages workflow
 /docs/app/runtime.zip
+
+# Generated self-hosted browser dependencies
+/docs/app/vendor/

@@ -21,6 +21,12 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - uses: actions/cache@v4
+        with:
+          path: docs/app/vendor
+          key: pages-runtime-${{ hashFiles('scripts/vendor_pages.py') }}
+      - name: Vendor pinned browser runtime and dependencies
+        run: python scripts/vendor_pages.py
       - name: Package browser source and test cases
         run: python scripts/build_pages.py
       - uses: actions/configure-pages@v5

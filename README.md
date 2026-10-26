@@ -93,15 +93,17 @@ utils/browser_client.py      Browser-compatible model HTTP client
 split_single_data.py         Prepare one sample from the source dataset
 requirements.txt             Python dependencies
 .env.example                 Configuration template without credentials
-docs/                        Project guide and Stlite browser entrypoint
+docs/                        Stlite browser application
 scripts/build_pages.py       Package public sources and samples for Pages
 ```
 
 ## Project website
 
-The GitHub Pages site includes both the project guide and a working browser edition at `/app/`. [Stlite](https://github.com/whitphx/stlite) runs Python through Pyodide/WebAssembly on the visitor's device, so GitHub Pages does not need a Python server.
+The GitHub Pages root URL opens the browser application directly. `/app/` remains an equivalent entrypoint. [Stlite](https://github.com/whitphx/stlite) runs Python through Pyodide/WebAssembly on the visitor's device, so GitHub Pages does not need a Python server.
 
 The GitHub Actions workflow in `.github/workflows/pages.yml` builds and publishes the site after pushes to `main`. `scripts/build_pages.py` packages an explicit allowlist of Python sources and test samples, including the published test `app.db`; it never bundles `.env`.
+
+`scripts/vendor_pages.py` downloads pinned Stlite, Pyodide and Python dependency assets into the Pages artifact. Browser startup loads these assets from this site instead of external CDNs or PyPI. The generated `docs/app/vendor/` directory is not committed.
 
 Browser edition details:
 
@@ -115,11 +117,12 @@ Browser edition details:
 For local website development:
 
 ```bash
+python scripts/vendor_pages.py
 python scripts/build_pages.py
 python -m http.server 8765 --directory docs
 ```
 
-Then visit `http://localhost:8765/app/`. Continue using native Streamlit when you need a server-side endpoint without browser CORS restrictions.
+Then visit `http://localhost:8765/` (or `/app/`). Continue using native Streamlit when you need a server-side endpoint without browser CORS restrictions.
 
 The included `app.db` and `template_nca_description.jsonl` provide test conversations and analysis examples. At runtime, the app updates `app.db` with conversation history and analysis results and overwrites the JSONL file during processing. These test files, along with the Pickle files, are allowed in Git.
 
