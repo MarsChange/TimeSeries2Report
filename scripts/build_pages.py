@@ -11,6 +11,7 @@ FILES = {
     'utils/browser_client.py': 'utils/browser_client.py',
     'samples/battery_time_series_for_test.pickle': 'battery_time_series_for_test.pickle',
     'samples/template_nca_description.jsonl': 'template_nca_description.jsonl',
+    'samples/app.db': 'app.db',
 }
 
 
@@ -23,7 +24,7 @@ def build():
             entry.compress_type = zipfile.ZIP_DEFLATED
             archive.writestr(entry, (ROOT / source).read_bytes())
         archive.writestr('utils/__init__.py', '')
-    print(f'Built {target.relative_to(ROOT)} ({len(FILES)} source/sample files; no .env or user database)')
+    print(f'Built {target.relative_to(ROOT)} ({len(FILES)} source/sample files including the published test database; no .env)')
 
 
 if __name__ == '__main__':

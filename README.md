@@ -101,7 +101,7 @@ scripts/build_pages.py       Package public sources and samples for Pages
 
 The GitHub Pages site includes both the project guide and a working browser edition at `/app/`. [Stlite](https://github.com/whitphx/stlite) runs Python through Pyodide/WebAssembly on the visitor's device, so GitHub Pages does not need a Python server.
 
-The GitHub Actions workflow in `.github/workflows/pages.yml` builds and publishes the site after pushes to `main`. `scripts/build_pages.py` packages an explicit allowlist of Python sources and test samples; it never bundles `.env` or the local `app.db`.
+The GitHub Actions workflow in `.github/workflows/pages.yml` builds and publishes the site after pushes to `main`. `scripts/build_pages.py` packages an explicit allowlist of Python sources and test samples, including the published test `app.db`; it never bundles `.env`.
 
 Browser edition details:
 
@@ -109,7 +109,7 @@ Browser edition details:
 - Configure your own API Key, HTTPS Base URL and Model Name under **Model Settings**. There is no server-side `.env` in the browser edition; keys remain in session memory and are sent to the configured provider.
 - The model endpoint must allow CORS requests from the GitHub Pages origin. Provider endpoints that work locally may reject browser requests. The page cannot bypass provider CORS restrictions.
 - API calls run sequentially without a thread pool. Chat receives a complete response before displaying it; native Streamlit keeps streaming support.
-- A fresh database is stored on your device using the browser's IndexedDB-backed filesystem. It is separate from the test `app.db` in the repository. Clearing site data removes browser history; private browsing may limit persistence.
+- On first launch, the published test `app.db` initializes a separate database on your device, so the same initial battery report and test conversations appear as in the native app. An empty database from an earlier browser version is also initialized; existing user history is preserved. Later changes stay in the browser's IndexedDB-backed filesystem. Clearing site data removes browser history; private browsing may limit persistence.
 - **Try the included test case → Load example report** displays the test report without making an API request. Download the test input there to try report generation with your provider.
 
 For local website development:

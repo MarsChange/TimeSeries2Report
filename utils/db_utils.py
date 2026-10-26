@@ -4,6 +4,7 @@ import threading
 import json
 import os
 import sys
+from pathlib import Path
 from types import SimpleNamespace
 from contextlib import contextmanager
 from typing import List, Dict, Optional, Any
@@ -98,6 +99,34 @@ def init_db():
         ''')
 
         conn.commit()
+
+    if sys.platform == "emscripten":
+        _seed_browser_test_database(conn)
+
+
+def _seed_browser_test_database(conn, sample_path=None):
+    """Seed the published test case once, without replacing a user's history."""
+    marker = Path(get_db_path()).with_name(".test-case-initialized")
+    sample = Path(sample_path) if sample_path else Path(__file__).resolve().parent.parent / "samples/app.db"
+    if marker.exists() or not sample.exists():
+        return
+
+    has_content = any(
+        conn.execute(f"SELECT 1 FROM {table} LIMIT 1").fetchone()
+        for table in ("messages", "analysis_results")
+    )
+    session_names = [row[0] for row in conn.execute("SELECT session_name FROM sessions")]
+    untouched = not has_content and session_names in ([], ["Session 1"])
+    if untouched:
+        # SQLite backup copies the test snapshot without sharing visitor databases.
+        source = sqlite3.connect(f"file:{sample}?mode=ro", uri=True)
+        try:
+            source.backup(conn)
+        finally:
+            source.close()
+        conn.commit()
+    # Also mark nonempty databases so clearing a conversation never reseeds it.
+    marker.write_text("seeded\n" if untouched else "existing-history-preserved\n")
 
 
 # ============= session management =============
