@@ -8,7 +8,7 @@ function fail() {
   failed = true;
   status.hidden = false;
   status.classList.add('error');
-  detail.textContent = '启动失败。请检查网络后刷新页面；仍失败可查看下方错误提示，或按使用说明在本地运行。';
+  detail.textContent = 'Unable to start the app. Check your connection and reload. If the problem persists, review the error below or follow the documentation to run locally.';
 }
 const timer = setInterval(() => {
   const app = document.querySelector('[data-testid="stSidebar"]');
@@ -18,8 +18,8 @@ const timer = setInterval(() => {
   const seconds = Math.floor((Date.now() - started) / 1000);
   const progress = [...document.querySelectorAll('[role="status"]')]
     .filter(node => !status.contains(node)).map(node => node.textContent.trim()).filter(Boolean).join(' · ');
-  detail.textContent = `首次启动正在下载 Python 和分析依赖（${seconds} 秒），请保持页面打开。${progress ? ' ' + progress : ''}`;
-  if (seconds > 180) detail.textContent += ' 网络较慢，仍在等待；可刷新重试。';
+  detail.textContent = `Downloading the Python runtime and analysis packages (${seconds}s elapsed). Please keep this page open.${progress ? ' ' + progress : ''}`;
+  if (seconds > 180) detail.textContent += ' Loading is taking longer than expected. You can keep waiting or reload to retry.';
 }, 1000);
 try {
   const response = await fetch(asset('vendor/requirements.json'));
