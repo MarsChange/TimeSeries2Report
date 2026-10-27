@@ -878,10 +878,13 @@ def main_interface():
         if uploaded_file is not None:
             st.info(f"📄 {uploaded_file.name} ({uploaded_file.size} bytes)")
             if st.button("Process File", use_container_width=True, type="primary", key=f"process_file_{st.session_state.current_session}", disabled=not model_config_ready):
-                with st.spinner("Processing file..."):
+                # Status indicators render immediately and animate without a timer thread.
+                with st.status("Generating battery report…", expanded=True) as report_status:
+                    st.caption("Analyzing the uploaded data and waiting for the model. Please keep this page open.")
                     try:
                         # Call file processing function (user-implemented)
                         result = geenerate_data_prompt(uploaded_file, model_config)
+                        report_status.update(label="Preparing the report and saving results…")
 
                         # Convert numpy arrays to lists for JSON serialization
                         result_serializable = convert_numpy_to_json_serializable(result)
@@ -923,8 +926,10 @@ def main_interface():
                                 # Also save system message to database
                                 add_message(st.session_state.current_session, "system", system_context_message["content"])
 
+                        report_status.update(label="Battery report generated", state="complete", expanded=False)
                         st.success("File processing complete! Data loaded to conversation context, you can now ask questions based on analysis results.")
                     except Exception as e:
+                        report_status.update(label="Report generation failed", state="error", expanded=True)
                         st.error(f"File processing failed ({type(e).__name__}). Check the data format, model settings and provider availability.")
                         if IS_BROWSER:
                             st.info("The model endpoint must allow cross-origin (CORS) requests from this website. Try a CORS-enabled endpoint or run the native Streamlit app locally.")
@@ -1036,6 +1041,9 @@ def main_interface():
 
         # Display assistant response
         with st.chat_message("assistant"):
+            reply_status = st.status("Generating a reply…", expanded=True)
+            with reply_status:
+                st.caption("Waiting for the model. This may take a moment; please keep this page open.")
             message_placeholder = st.empty()
             try:
                 # Initialize client
@@ -1054,12 +1062,16 @@ def main_interface():
                 # Stream display response
                 for chunk in stream:
                     if chunk.choices[0].delta.content is not None:
+                        if not full_response:
+                            reply_status.update(label="Receiving the reply…", expanded=False)
                         full_response += chunk.choices[0].delta.content
                         message_placeholder.markdown(full_response + "▌")
 
                 message_placeholder.markdown(full_response)
+                reply_status.update(label="Reply generated", state="complete", expanded=False)
 
             except Exception as e:
+                reply_status.update(label="Reply generation failed", state="error", expanded=True)
                 full_response = f"Model request failed ({type(e).__name__}). Check the model settings and provider availability."
                 message_placeholder.error(full_response)
                 if IS_BROWSER:

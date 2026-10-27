@@ -35,7 +35,7 @@ try {
     },
     prebuiltPackageNames: ['numpy','matplotlib','requests','sqlite3','pandas','altair','cachetools','protobuf','typing-extensions','pyodide-http','fastparquet'],
     requirements: wheels.map(asset),
-    archives: [{url: asset('runtime.zip?v=20261026-selfhost'), format: 'zip'}],
+    archives: [{url: asset('runtime.zip?v=20261027-generation'), format: 'zip'}],
     idbfsMountpoints: ['/ts2r-data'],
     streamlitConfig: {
       'client.toolbarMode': 'viewer',
